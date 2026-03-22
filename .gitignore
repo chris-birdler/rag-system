@@ -1,0 +1,14 @@
+.env
+venv/
+__pycache__/
+*.pyc
+.chroma/
+node_modules/
+frontend/build/
+data/pdfs/
+*.log
+.DS_Store
+log.txt
+test.py
+test.sh
+index_papers.py
