@@ -172,12 +172,12 @@ RERANKER=local
 
 ## 🔒 Deployment Stacks
 
-| Stack | LLM | Embeddings | Re-Ranking | Cost |
-|-------|-----|-----------|------------|------|
-| Cloud (best quality) | GPT-4o-mini | text-embedding-3-large | Cohere | ~$0.05/query |
-| Cloud (cheapest) | DeepSeek | text-embedding-3-small | Cohere | ~$0.001/query |
-| Local (private) | Ollama DeepSeek-R1 | nomic-embed-text | CrossEncoder | Free |
-| Local (minimal) | Ollama Llama3.2 | nomic-embed-text | CrossEncoder | Free |
+| Stack | LLM | Embeddings | Re-Ranking |
+|-------|-----|-----------|------------|
+| Cloud (best quality) | GPT-4o-mini | text-embedding-3-large | Cohere |
+| Cloud (cheapest) | DeepSeek | text-embedding-3-small | Cohere |
+| Local (private) | Ollama DeepSeek-R1 | nomic-embed-text | CrossEncoder |
+| Local (minimal) | Ollama Llama3.2 | nomic-embed-text | CrossEncoder |
 
 ---
 
@@ -210,15 +210,6 @@ rag-system/
 ├── docker-compose.yml
 └── requirements.txt
 ```
-
----
-
-## 🎓 Background
-
-Built as part of a structured AI/ML learning plan to transition from computational physics research into AI Engineering. The system demonstrates production-ready RAG patterns including hybrid retrieval, re-ranking, and multi-provider LLM support.
-
-**Author:** Christoph Vogler | Vienna, Austria  
-**Stack:** Python · FastAPI · React · TypeScript · Docker · ChromaDB · OpenAI
 
 ---
 
