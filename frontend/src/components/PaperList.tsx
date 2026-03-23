@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { listPapers, uploadPaper, deletePaper } from '../api/client';
+import { listPapers, uploadPaper, deletePaper, getIndexingStatus } from '../api/client';
 
 interface Paper {
   filename: string;
@@ -30,14 +30,36 @@ export default function PaperList() {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    setMessage('');
+    setMessage('Uploading...');
+    
     try {
-      const result = await uploadPaper(file);
-      setMessage(result.message);
-      loadPapers();
+      // Upload – bekommt sofort Antwort
+      await uploadPaper(file);
+      setMessage('Indexing in background...');
+
+      // Pollen bis fertig
+      const poll = setInterval(async () => {
+        try {
+          const status = await getIndexingStatus(file.name);
+          if (status.status === 'done') {
+            setMessage(`✅ '${file.name}' indexed (${status.chunks} chunks)`);
+            clearInterval(poll);
+            setUploading(false);
+            loadPapers();
+          } else if (status.status === 'failed') {
+            setMessage(`❌ Indexing failed: ${status.error}`);
+            clearInterval(poll);
+            setUploading(false);
+          } else if (status.status === 'already_indexed') {
+            setMessage(`'${file.name}' already indexed`);
+            clearInterval(poll);
+            setUploading(false);
+          }
+        } catch {}
+      }, 2000); // alle 2 Sekunden prüfen
+
     } catch {
       setMessage('Upload failed');
-    } finally {
       setUploading(false);
     }
   };

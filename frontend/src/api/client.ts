@@ -56,3 +56,8 @@ export const deletePaper = async (doi: string) => {
   const res = await api.delete(`/papers/${encodeURIComponent(doi)}`);
   return res.data;
 };
+
+export const getIndexingStatus = async (filename: string) => {
+  const res = await api.get(`/papers/status/${encodeURIComponent(filename)}`);
+  return res.data;
+};

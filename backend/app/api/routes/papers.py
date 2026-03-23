@@ -1,7 +1,7 @@
 # backend/app/api/routes/papers.py
 import shutil
 from pathlib import Path
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, BackgroundTasks
 
 from backend.app.services.library import PaperLibrary
 from backend.app.core.auth import get_current_user, require_admin
@@ -13,8 +13,45 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 def get_library():
     return PaperLibrary()
 
+# In-Memory Status Store
+# Key: filename, Value: status dict
+indexing_status: dict[str, dict] = {}
+
+def _index_paper_task(file_path: str, filename: str) -> None:
+    """
+    Background Task – läuft nach dem Response.
+    Updated den Status während der Indexierung.
+    """
+    try:
+        indexing_status[filename] = {
+            "status": "indexing",
+            "filename": filename
+        }
+        library = PaperLibrary()
+        result = library.add_paper(file_path)
+
+        if not result:
+            indexing_status[filename] = {
+                "status": "already_indexed",
+                "filename": filename
+            }
+        else:
+            indexing_status[filename] = {
+                "status": "done",
+                "filename": filename,
+                "chunks": result.get("chunks", 0),
+                "title": result.get("title", ""),
+            }
+    except Exception as e:
+        indexing_status[filename] = {
+            "status": "failed",
+            "filename": filename,
+            "error": str(e)
+        }
+
 @router.post("/upload")
 async def upload_paper(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     user: dict = Depends(require_admin)  # ← nur Admin
 ):
@@ -31,17 +68,33 @@ async def upload_paper(
     with open(file_path, "wb") as f:
         shutil.copyfileobj(file.file, f)
 
-    # Indexieren
-    library = get_library()
-    result = library.add_paper(str(file_path))
+    # Indexierung im Hintergrund starten
+    background_tasks.add_task(
+        _index_paper_task,
+        str(file_path),
+        file.filename
+    )
 
-    if not result:
-        return {"message": f"'{file.filename}' already indexed"}
-
+    # Sofort antworten – nicht warten
     return {
-        "message": f"'{file.filename}' successfully indexed",
-        "metadata": result
+        "status": "indexing",
+        "message": f"'{file.filename}' upload received, indexing started",
+        "filename": file.filename
     }
+
+@router.get("/status/{filename}")
+def get_indexing_status(
+    filename: str,
+    user: dict = Depends(get_current_user)
+):
+    """
+    Status der Indexierung abfragen.
+    Frontend kann diesen Endpoint pollen bis status='done'
+    """
+    status = indexing_status.get(filename)
+    if not status:
+        return {"status": "unknown", "filename": filename}
+    return status
 
 @router.get("/")
 def list_papers(
