@@ -51,3 +51,8 @@ export const clearHistory = async () => {
 };
 
 export const isLoggedIn = () => !!localStorage.getItem('token');
+
+export const deletePaper = async (doi: string) => {
+  const res = await api.delete(`/papers/${encodeURIComponent(doi)}`);
+  return res.data;
+};

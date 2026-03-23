@@ -52,10 +52,31 @@ def list_papers(
     return library.list_papers()
 
 @router.delete("/{doi:path}")
-def delete_paper(doi: str):
+def delete_paper(
+    doi: str,
+    user: dict = Depends(require_admin)
+):
     """
     Paper aus Index entfernen.
-    DOI als Path Parameter – enthält Slashes daher doi:path
+    Löscht alle Chunks dieses Papers aus ChromaDB und BM25.
+    Nur Admins dürfen löschen.
     """
-    # TODO in Schritt 11 implementieren
-    raise HTTPException(501, "Not implemented yet")
+    library = PaperLibrary()
+    
+    # Prüfe ob Paper existiert
+    results = library._collection.get(
+        where={"doi": {"$eq": doi}},
+        limit=1
+    )
+    if not results["ids"]:
+        raise HTTPException(404, f"Paper with DOI '{doi}' not found")
+    
+    # Alle Chunks dieses Papers löschen
+    library._collection.delete(
+        where={"doi": {"$eq": doi}}
+    )
+    
+    # BM25 neu aufbauen
+    library._rebuild_bm25()
+    
+    return {"message": f"Paper '{doi}' deleted successfully"}

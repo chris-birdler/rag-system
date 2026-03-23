@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { listPapers, uploadPaper } from '../api/client';
+import { listPapers, uploadPaper, deletePaper } from '../api/client';
 
 interface Paper {
   filename: string;
@@ -41,6 +41,17 @@ export default function PaperList() {
       setUploading(false);
     }
   };
+
+  // Delete Handler
+const handleDelete = async (doi: string) => {
+  if (!window.confirm('Delete this paper?')) return;
+  try {
+    await deletePaper(doi);
+    loadPapers();
+  } catch {
+    alert('Delete failed');
+  }
+};
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -93,19 +104,41 @@ export default function PaperList() {
               borderRadius: '8px',
               marginBottom: '6px',
               background: '#16213e',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
             }}
           >
-            <div style={{ fontSize: '12px', color: 'white', marginBottom: '4px' }}>
-              {paper.title
-                ? paper.title.substring(0, 60) + (paper.title.length > 60 ? '...' : '')
-                : paper.filename}
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '12px', color: 'white', marginBottom: '4px' }}>
+                {paper.title
+                  ? paper.title.substring(0, 60) + (paper.title.length > 60 ? '...' : '')
+                  : paper.filename}
+              </div>
+              <div style={{ fontSize: '11px', color: '#888' }}>
+                {paper.year && `${paper.year} · `}
+                {paper.authors
+                  ? paper.authors.split(';')[0].split(',')[0].trim() + ' et al.'
+                  : ''}
+              </div>
             </div>
-            <div style={{ fontSize: '11px', color: '#888' }}>
-              {paper.year && `${paper.year} · `}
-              {paper.authors
-                ? paper.authors.split(';')[0].split(',')[0].trim() + ' et al.'
-                : ''}
-            </div>
+            {paper.doi && (
+              <button
+                onClick={() => handleDelete(paper.doi)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#e94560',
+                  cursor: 'pointer',
+                  fontSize: '18px',
+                  padding: '0 4px',
+                  flexShrink: 0,
+                  lineHeight: 1,
+                }}
+              >
+                ×
+              </button>
+            )}
           </div>
         ))}
       </div>
