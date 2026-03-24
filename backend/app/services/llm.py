@@ -1,5 +1,3 @@
-# backend/app/services/llm.py
-
 """
 LLM Factory – gibt den richtigen LLM Client zurück.
 
@@ -14,7 +12,9 @@ verwendet wird – alle haben dasselbe Interface.
 """
 
 from backend.app.core.config import settings
+from backend.app.services.cost_tracker import CostTracker
 
+tracker = CostTracker()
 
 def get_llm_response(
     messages: list[dict],
@@ -63,6 +63,15 @@ def _openai_response(
         temperature=temperature,
         max_tokens=max_tokens
     )
+    
+    # Kosten tracken
+    tracker.log(
+        model=settings.llm_model,
+        input_tokens=response.usage.prompt_tokens,
+        output_tokens=response.usage.completion_tokens,
+        call_type="llm"
+    )
+
     return response.choices[0].message.content
 
 
