@@ -29,6 +29,10 @@ Rules:
 - Use precise scientific language
 - Structure your answer: direct answer first, then details
 - If multiple papers address the question, synthesize the information
+- For questions about conditions or mechanisms: always explain the 
+  PHYSICAL MEANING, not just the mathematical formula
+- For questions about "why" or "how": explain the underlying mechanism
+  step by step
 
 Format for citations: [Author name et al. (Year), Page X, Section Name]
 """
