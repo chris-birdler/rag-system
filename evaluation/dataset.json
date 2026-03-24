@@ -1,0 +1,81 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "question": "At what temperature were the SQUID measurements performed?",
+      "expected_answer": "40 K",
+      "expected_page": 2,
+      "paper_doi": "10.1103/PhysRevB.102.014429"
+    },
+    {
+      "id": 2,
+      "question": "What is the coercive field of the ferrimagnetic TbCoFe layer?",
+      "expected_answer": "about 3 T",
+      "expected_page": 3,
+      "paper_doi": "10.1103/PhysRevB.102.014429"
+    },
+    {
+      "id": 3,
+      "question": "What is the mathematical condition for hysteresis-free reversal?",
+      "expected_answer": "analytical equation involving domain wall energy and anisotropy",
+      "expected_page": 4,
+      "paper_doi": "10.1103/PhysRevB.102.014429"
+    },
+    {
+      "id": 4,
+      "question": "What physical mechanism enables hysteresis-free reversal?",
+      "expected_answer": "partial domain wall generates intrinsic hard-axis bias field that overcomes FM anisotropy field",
+      "expected_page": 7,
+      "paper_doi": "10.1103/PhysRevB.102.014429"
+    },
+    {
+      "id": 5,
+      "question": "What substrate was used for sample preparation?",
+      "expected_answer": "Si(001)/SiO2(100 nm)",
+      "expected_page": 2,
+      "paper_doi": "10.1103/PhysRevB.102.014429"
+    },
+    {
+      "id": 6,
+      "question": "What is the effective anisotropy constant Keff of the ferrimagnetic layer?",
+      "expected_answer": "1000 kJ/m3",
+      "expected_page": 2,
+      "paper_doi": "10.1103/PhysRevB.102.014429"
+    },
+    {
+      "id": 7,
+      "question": "What deposition method was used to prepare the samples?",
+      "expected_answer": "magnetron co-sputtering from elemental targets",
+      "expected_page": 2,
+      "paper_doi": "10.1103/PhysRevB.102.014429"
+    },
+    {
+      "id": 8,
+      "question": "What is the saturation magnetization of the Co/Ni/Pt multilayer?",
+      "expected_answer": "0.84 T",
+      "expected_page": 2,
+      "paper_doi": "10.1103/PhysRevB.102.014429"
+    },
+    {
+      "id": 9,
+      "question": "What software was used for micromagnetic simulations?",
+      "expected_answer": "MAGNUM.FE",
+      "expected_page": 2,
+      "paper_doi": "10.1103/PhysRevB.102.014429"
+    },
+    {
+      "id": 10,
+      "question": "What two distinct reversal mechanisms were observed?",
+      "expected_answer": "irreversible switching for thick FM layers and reversible hysteresis-free switching for thin FM layers",
+      "expected_page": 6,
+      "paper_doi": "10.1021/acsanm.0c01835"
+    },
+    {
+      "id": 11,
+      "question": "What imaging technique was used to study the microscopic reversal?",
+      "expected_answer": "magnetic force microscopy MFM",
+      "expected_page": 3,
+      "paper_doi": "10.1021/acsanm.0c01835"
+    }
+  ]
+}

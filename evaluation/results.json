@@ -1,0 +1,124 @@
+{
+  "config": {
+    "k": 5,
+    "page_tolerance": 1,
+    "total_questions": 11
+  },
+  "metrics": {
+    "recall_at_k": 1.0,
+    "avg_answer_score": 3.0,
+    "answer_correctness": 1.0
+  },
+  "details": [
+    {
+      "id": 1,
+      "question": "At what temperature were the SQUID measurements performed?",
+      "expected_answer": "40 K",
+      "actual_answer": "The SQUID measurements were performed at a temperature of 40 K. This is explicitly stated in the excerpts, where it mentions that \"All measurements were performed at 40 K\" [Vogler et al. (2020), Page ",
+      "expected_page": 2,
+      "recall": true,
+      "answer_score": 3,
+      "answer_reason": "The actual answer correctly states the temperature of the SQUID measurements as 40 K and provides a reference to the source, making it complete and accurate."
+    },
+    {
+      "id": 2,
+      "question": "What is the coercive field of the ferrimagnetic TbCoFe layer?",
+      "expected_answer": "about 3 T",
+      "actual_answer": "The coercive field of the ferrimagnetic TbCoFe layer is approximately 3 T. \n\nThis value is derived from the observation that the reference sample consisting solely of the ferrimagnetic layer exhibits ",
+      "expected_page": 3,
+      "recall": true,
+      "answer_score": 3,
+      "answer_reason": "The actual answer correctly states the coercive field of the TbCoFe layer as approximately 3 T and provides relevant context about its magnetic properties and significance."
+    },
+    {
+      "id": 3,
+      "question": "What is the mathematical condition for hysteresis-free reversal?",
+      "expected_answer": "analytical equation involving domain wall energy and anisotropy",
+      "actual_answer": "The mathematical condition for hysteresis-free reversal is given by the equation:\n\n\\[\n\\sigma_{FM}^2 - \\sigma_{FM} k + \\sigma_{FI}^2 k^2 \\left(1 + \\frac{\\sigma_{FM}}{|J_{iex}|}\\right)^2 > K_{FM} t_{FM}",
+      "expected_page": 4,
+      "recall": true,
+      "answer_score": 3,
+      "answer_reason": "The actual answer provides a detailed analytical equation that captures the mathematical condition for hysteresis-free reversal, including relevant parameters and their physical significance, aligning well with the expected answer."
+    },
+    {
+      "id": 4,
+      "question": "What physical mechanism enables hysteresis-free reversal?",
+      "expected_answer": "partial domain wall generates intrinsic hard-axis bias field that overcomes FM anisotropy field",
+      "actual_answer": "The physical mechanism enabling hysteresis-free reversal in exchange-coupled bilayers involves the formation of a partial domain wall within the ferromagnetic layer during magnetization reversal. This",
+      "expected_page": 7,
+      "recall": true,
+      "answer_score": 3,
+      "answer_reason": "The actual answer correctly explains the physical mechanism of hysteresis-free reversal, detailing the role of the partial domain wall and the intrinsic hard-axis bias field in overcoming the magnetic anisotropy field. It also references relevant theoretical models and conditions necessary for achieving hysteresis-free behavior, aligning well with the expected answer."
+    },
+    {
+      "id": 5,
+      "question": "What substrate was used for sample preparation?",
+      "expected_answer": "Si(001)/SiO2(100 nm)",
+      "actual_answer": "The substrate used for sample preparation was Si(001) with a 100 nm-thick thermally oxidized SiO2 layer. This was consistent across the experiments described in the provided excerpts [1] (Vogler et al",
+      "expected_page": 2,
+      "recall": true,
+      "answer_score": 3,
+      "answer_reason": "The actual answer correctly identifies the substrate as Si(001) and specifies the thickness of the SiO2 layer as 100 nm, which matches the expected answer."
+    },
+    {
+      "id": 6,
+      "question": "What is the effective anisotropy constant Keff of the ferrimagnetic layer?",
+      "expected_answer": "1000 kJ/m3",
+      "actual_answer": "The effective anisotropy constant \\( K_{eff} \\) of the ferrimagnetic layer (Tb28Co14Fe58) is 1000 kJ/m\u00b3. This value is stated in the context of the magnetic properties of the heterostructures, where i",
+      "expected_page": 2,
+      "recall": true,
+      "answer_score": 3,
+      "answer_reason": "The actual answer correctly states the effective anisotropy constant ( K_{eff} ) of the ferrimagnetic layer as 1000 kJ/m\u00b3 and provides context regarding its significance and the conditions under which it was measured."
+    },
+    {
+      "id": 7,
+      "question": "What deposition method was used to prepare the samples?",
+      "expected_answer": "magnetron co-sputtering from elemental targets",
+      "actual_answer": "The deposition method used to prepare the samples was dc magnetron (co-)sputtering from elemental targets. This process was conducted at room temperature on Si(001) substrates with a 100 nm-thick ther",
+      "expected_page": 2,
+      "recall": true,
+      "answer_score": 3,
+      "answer_reason": "The actual answer correctly identifies the deposition method as dc magnetron (co-)sputtering from elemental targets, which matches the expected answer. It also provides additional relevant details about the process, but these do not detract from the correctness of the key information."
+    },
+    {
+      "id": 8,
+      "question": "What is the saturation magnetization of the Co/Ni/Pt multilayer?",
+      "expected_answer": "0.84 T",
+      "actual_answer": "The saturation magnetization of the Co/Ni/Pt multilayer is approximately 0.84 T at 40 K. This value is consistent across different repetition numbers of the multilayer, as indicated in the experiments",
+      "expected_page": 2,
+      "recall": true,
+      "answer_score": 3,
+      "answer_reason": "The actual answer provides the correct saturation magnetization value of 0.84 T and includes relevant context about the temperature and consistency across experiments, making it complete and accurate."
+    },
+    {
+      "id": 9,
+      "question": "What software was used for micromagnetic simulations?",
+      "expected_answer": "MAGNUM.FE",
+      "actual_answer": "The software used for micromagnetic simulations is MAGNUM.FE. This software was employed to simulate the field dependence of the total z component of the magnetic moment in the study of exchange-coupl",
+      "expected_page": 2,
+      "recall": true,
+      "answer_score": 3,
+      "answer_reason": "The actual answer correctly identifies the software used for micromagnetic simulations as MAGNUM.FE and provides additional relevant context about its application in the study."
+    },
+    {
+      "id": 10,
+      "question": "What two distinct reversal mechanisms were observed?",
+      "expected_answer": "irreversible switching for thick FM layers and reversible hysteresis-free switching for thin FM layers",
+      "actual_answer": "The two distinct reversal mechanisms observed in the nanoscale exchange-coupled bilayer system are:\n\n1. **Irreversible Switching**: This mechanism occurs in thicker ferromagnetic (FM) layers (specific",
+      "expected_page": 6,
+      "recall": true,
+      "answer_score": 3,
+      "answer_reason": "The actual answer correctly identifies the two distinct reversal mechanisms: irreversible switching for thick FM layers and reversible switching for thin FM layers, providing sufficient detail and context."
+    },
+    {
+      "id": 11,
+      "question": "What imaging technique was used to study the microscopic reversal?",
+      "expected_answer": "magnetic force microscopy MFM",
+      "actual_answer": "The imaging technique used to study the microscopic reversal was high-resolution magnetic force microscopy (MFM). This technique allowed for the detailed investigation of the complex magnetization rev",
+      "expected_page": 3,
+      "recall": true,
+      "answer_score": 3,
+      "answer_reason": "The actual answer correctly identifies the imaging technique as high-resolution magnetic force microscopy (MFM), which is a valid and complete response to the question about the technique used to study microscopic reversal."
+    }
+  ]
+}
