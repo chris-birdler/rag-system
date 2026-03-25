@@ -1,9 +1,11 @@
-# backend/app/api/routes/health.py
+from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
 from backend.app.services.library import PaperLibrary
 from backend.app.core.config import settings
 from backend.app.services.cost_tracker import CostTracker
 from backend.app.core.auth import get_current_user
+from backend.app.db.database import get_db
+from backend.app.db.repositories import cost_repo
 
 router = APIRouter()
 
@@ -23,7 +25,8 @@ def stats():
     return library.get_stats()
 
 @router.get("/costs")
-def get_costs(user: dict = Depends(get_current_user)):
-    """API Kosten Übersicht."""
-    tracker = CostTracker()
-    return tracker.get_summary()
+def get_costs(
+    user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    return cost_repo.get_summary(db)

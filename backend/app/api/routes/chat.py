@@ -4,6 +4,10 @@ from pydantic import BaseModel
 from backend.app.services.rag_engine import RAGEngine
 from backend.app.services.session_store import SessionStore
 from backend.app.core.auth import get_current_user
+from sqlalchemy.orm import Session
+from backend.app.db.database import get_db
+from backend.app.db.repositories import session_repo
+from backend.app.db.repositories import cost_repo
 
 router = APIRouter()
 
@@ -25,13 +29,14 @@ store = SessionStore(max_messages=20)
 @router.post("/ask", response_model=AnswerResponse)
 def ask(
     request: QuestionRequest,
-    user: dict = Depends(get_current_user)  # ← NEU
+    user: dict = Depends(get_current_user), # ← NEU
+    db: Session = Depends(get_db)
 ):
     
     username = user["username"]
 
     # History für diesen User holen
-    history = store.get_history(username)
+    history = session_repo.get_history(db, username)
 
     result = engine.ask(
         question=request.question,
@@ -40,9 +45,9 @@ def ask(
         n_chunks=request.n_chunks
     )
 
-    # History updaten
-    store.add_message(username, "user", request.question)
-    store.add_message(username, "assistant", result["answer"])
+    # History in DB speichern
+    session_repo.add_message(db, username, "user", request.question)
+    session_repo.add_message(db, username, "assistant", result["answer"])
 
     return AnswerResponse(
         question=result["question"],
@@ -50,17 +55,21 @@ def ask(
         sources=result["sources"]
     )
 
+
 @router.delete("/history")
-def clear_history(user: dict = Depends(get_current_user)):
-    """Konversations-History löschen."""
-    store.clear(user["username"])
+def clear_history(
+    user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    session_repo.clear_history(db, user["username"])
     return {"message": "History cleared"}
 
 
 @router.get("/history")
-def get_history(user: dict = Depends(get_current_user)):
-    """Aktuelle History abrufen."""
-    return {
-        "history": store.get_history(user["username"]),
-        "stats": store.get_stats(user["username"])
-    }
+def get_history(
+    user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    history = session_repo.get_history(db, user["username"])
+    stats = session_repo.get_stats(db, user["username"])
+    return {"history": history, "stats": stats}
