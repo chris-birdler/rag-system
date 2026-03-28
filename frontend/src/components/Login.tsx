@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { login } from '../api/client';
+import './Login.css';
 
 interface Props {
   onLogin: () => void;
@@ -25,50 +26,22 @@ export default function Login({ onLogin }: Props) {
   };
 
   return (
-    <div style={{
-      height: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: '#1a1a2e',
-    }}>
-      <div style={{
-        background: '#16213e',
-        padding: '40px',
-        borderRadius: '12px',
-        width: '360px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
-      }}>
-        <h1 style={{ color: 'white', margin: 0, fontSize: '24px', textAlign: 'center' }}>
+    <div className="login">
+      <div className="login-card">
+        <h1 className="login-title">
           RAG System
         </h1>
-        <p style={{ color: '#888', margin: 0, textAlign: 'center', fontSize: '14px' }}>
+        <p className="login-subtitle">
           Scientific Paper Assistant
         </p>
         <input
-          style={{
-            padding: '12px',
-            borderRadius: '8px',
-            border: '1px solid #333',
-            background: '#0f3460',
-            color: 'white',
-            fontSize: '14px',
-          }}
+          className="login-input"
           placeholder="Username"
           value={username}
           onChange={e => setUsername(e.target.value)}
         />
         <input
-          style={{
-            padding: '12px',
-            borderRadius: '8px',
-            border: '1px solid #333',
-            background: '#0f3460',
-            color: 'white',
-            fontSize: '14px',
-          }}
+          className="login-input"
           type="password"
           placeholder="Password"
           value={password}
@@ -76,21 +49,12 @@ export default function Login({ onLogin }: Props) {
           onKeyDown={e => e.key === 'Enter' && handleLogin()}
         />
         {error && (
-          <p style={{ color: '#e94560', margin: 0, fontSize: '14px', textAlign: 'center' }}>
+          <p className="login-error">
             {error}
           </p>
         )}
         <button
-          style={{
-            padding: '12px',
-            borderRadius: '8px',
-            border: 'none',
-            background: '#e94560',
-            color: 'white',
-            fontSize: '16px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-          }}
+          className="login-btn"
           onClick={handleLogin}
           disabled={loading}
         >

@@ -1,0 +1,48 @@
+.main {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #1a1a2e;
+  color: white;
+}
+
+.main-header {
+  padding: 16px 24px;
+  background: #16213e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333;
+}
+
+.main-title {
+  margin: 0;
+  font-size: 20px;
+  color: white;
+}
+
+.main-logout-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #555;
+  border-radius: 6px;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.main-sidebar {
+  width: 280px;
+  border-right: 1px solid #333;
+  overflow: auto;
+}
+
+.main-chat {
+  flex: 1;
+  overflow: hidden;
+}

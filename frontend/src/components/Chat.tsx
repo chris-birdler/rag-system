@@ -4,6 +4,7 @@ import { askQuestion, clearHistory } from '../api/client';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
+import './Chat.css';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -63,45 +64,19 @@ export default function Chat() {
   };
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div className="chat">
 
       {/* Messages */}
-      <div style={{
-        flex: 1,
-        overflow: 'auto',
-        padding: '24px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
-      }}>
+      <div className="chat-messages">
         {messages.length === 0 && (
-          <div style={{
-            textAlign: 'center',
-            color: '#555',
-            marginTop: '40px',
-            fontSize: '16px',
-          }}>
+          <div className="chat-empty">
             Ask a question about your papers...
           </div>
         )}
 
         {messages.map((msg, i) => (
-          <div key={i} style={{
-            padding: '16px',
-            borderRadius: '12px',
-            maxWidth: msg.role === 'user' ? '80%' : '90%',
-            background: msg.role === 'user' ? '#0f3460' : '#16213e',
-            alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-            color: msg.role === 'user' ? 'white' : '#e0e0e0',
-            fontSize: '14px',
-            lineHeight: '1.6',
-          }}>
-            <div style={{
-              fontSize: '11px',
-              color: '#888',
-              marginBottom: '8px',
-              fontWeight: 'bold',
-            }}>
+          <div key={i} className={`chat-message ${msg.role}`}>
+            <div className="chat-message-role">
               {msg.role === 'user' ? '👤 You' : '🤖 Assistant'}
             </div>
 
@@ -111,21 +86,13 @@ export default function Chat() {
             >
               {processLatex(msg.content)}
             </ReactMarkdown>
-            
+
           </div>
         ))}
 
         {loading && (
-          <div style={{
-            padding: '16px',
-            borderRadius: '12px',
-            background: '#16213e',
-            alignSelf: 'flex-start',
-            color: '#888',
-            fontStyle: 'italic',
-            fontSize: '14px',
-          }}>
-            <div style={{ fontSize: '11px', color: '#888', marginBottom: '8px', fontWeight: 'bold' }}>
+          <div className="chat-loading">
+            <div className="chat-message-role">
               🤖 Assistant
             </div>
             Thinking...
@@ -136,38 +103,22 @@ export default function Chat() {
 
       {/* Sources */}
       {sources.length > 0 && (
-        <div style={{
-          padding: '12px 24px',
-          borderTop: '1px solid #333',
-          background: '#16213e',
-          display: 'flex',
-          gap: '12px',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-        }}>
-          <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold' }}>
+        <div className="chat-sources">
+          <span className="chat-sources-label">
             Sources
           </span>
           {sources.map((s, i) => (
-            <div key={i} style={{
-              display: 'flex',
-              gap: '8px',
-              alignItems: 'center',
-              background: '#0f3460',
-              padding: '6px 10px',
-              borderRadius: '6px',
-              fontSize: '11px',
-            }}>
-              <span style={{ color: 'white' }}>
+            <div key={i} className="chat-source">
+              <span className="chat-source-author">
                 {s.authors.split(';')[0].split(',')[0].trim()} et al. ({s.year})
               </span>
-              <span style={{ color: '#888' }}>Page {s.page} · {s.section}</span>
+              <span className="chat-source-detail">Page {s.page} · {s.section}</span>
               {s.doi && (
                 <a
                   href={`https://doi.org/${s.doi}`}
                   target="_blank"
                   rel="noreferrer"
-                  style={{ color: '#e94560', textDecoration: 'none', fontWeight: 'bold' }}
+                  className="chat-source-doi"
                 >
                   DOI
                 </a>
@@ -178,39 +129,15 @@ export default function Chat() {
       )}
 
       {/* Input */}
-      <div style={{
-        padding: '16px 24px',
-        borderTop: '1px solid #333',
-        display: 'flex',
-        gap: '12px',
-        alignItems: 'center',
-        background: '#16213e',
-      }}>
+      <div className="chat-input-bar">
         <button
-          style={{
-            padding: '12px 16px',
-            background: 'transparent',
-            border: '1px solid #555',
-            borderRadius: '8px',
-            color: '#888',
-            cursor: 'pointer',
-            fontSize: '14px',
-          }}
+          className="chat-clear-btn"
           onClick={handleClear}
         >
           Clear
         </button>
         <input
-          style={{
-            flex: 1,
-            padding: '12px 16px',
-            borderRadius: '8px',
-            border: '1px solid #333',
-            background: '#0f3460',
-            color: 'white',
-            fontSize: '14px',
-            outline: 'none',
-          }}
+          className="chat-input"
           placeholder="Ask about your papers..."
           value={input}
           onChange={e => setInput(e.target.value)}
@@ -218,16 +145,7 @@ export default function Chat() {
           disabled={loading}
         />
         <button
-          style={{
-            padding: '12px 24px',
-            background: loading || !input.trim() ? '#555' : '#e94560',
-            border: 'none',
-            borderRadius: '8px',
-            color: 'white',
-            cursor: loading || !input.trim() ? 'default' : 'pointer',
-            fontWeight: 'bold',
-            fontSize: '14px',
-          }}
+          className="chat-send-btn"
           onClick={handleAsk}
           disabled={loading || !input.trim()}
         >

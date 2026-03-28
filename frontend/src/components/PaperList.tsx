@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { listPapers, uploadPaper, deletePaper, getIndexingStatus } from '../api/client';
+import './PaperList.css';
 
 interface Paper {
   filename: string;
@@ -31,7 +32,7 @@ export default function PaperList() {
     if (!file) return;
     setUploading(true);
     setMessage('Uploading...');
-    
+
     try {
       // Upload – bekommt sofort Antwort
       await uploadPaper(file);
@@ -76,27 +77,11 @@ const handleDelete = async (doi: string) => {
 };
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <div style={{
-        padding: '16px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderBottom: '1px solid #333',
-        fontSize: '14px',
-        color: '#aaa',
-      }}>
+    <div className="paper-list">
+      <div className="paper-list-header">
         <span>Papers ({papers.length})</span>
         <button
-          style={{
-            padding: '6px 12px',
-            background: '#e94560',
-            border: 'none',
-            borderRadius: '6px',
-            color: 'white',
-            cursor: 'pointer',
-            fontSize: '12px',
-          }}
+          className="paper-list-upload-btn"
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
         >
@@ -112,32 +97,24 @@ const handleDelete = async (doi: string) => {
       </div>
 
       {message && (
-        <p style={{ padding: '8px 16px', fontSize: '12px', color: '#4caf50', margin: 0 }}>
+        <p className="paper-list-message">
           {message}
         </p>
       )}
 
-      <div style={{ flex: 1, overflow: 'auto', padding: '8px' }}>
+      <div className="paper-list-content">
         {papers.map(paper => (
           <div
             key={paper.doi || paper.filename}
-            style={{
-              padding: '10px 12px',
-              borderRadius: '8px',
-              marginBottom: '6px',
-              background: '#16213e',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-            }}
+            className="paper-card"
           >
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '12px', color: 'white', marginBottom: '4px' }}>
+            <div className="paper-info">
+              <div className="paper-title">
                 {paper.title
                   ? paper.title.substring(0, 60) + (paper.title.length > 60 ? '...' : '')
                   : paper.filename}
               </div>
-              <div style={{ fontSize: '11px', color: '#888' }}>
+              <div className="paper-meta">
                 {paper.year && `${paper.year} · `}
                 {paper.authors
                   ? paper.authors.split(';')[0].split(',')[0].trim() + ' et al.'
@@ -147,16 +124,7 @@ const handleDelete = async (doi: string) => {
             {paper.doi && (
               <button
                 onClick={() => handleDelete(paper.doi)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#e94560',
-                  cursor: 'pointer',
-                  fontSize: '18px',
-                  padding: '0 4px',
-                  flexShrink: 0,
-                  lineHeight: 1,
-                }}
+                className="paper-delete-btn"
               >
                 ×
               </button>

@@ -1,0 +1,74 @@
+.paper-list {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.paper-list-header {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333;
+  font-size: 14px;
+  color: #aaa;
+}
+
+.paper-list-upload-btn {
+  padding: 6px 12px;
+  background: #e94560;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.paper-list-message {
+  padding: 8px 16px;
+  font-size: 12px;
+  color: #4caf50;
+  margin: 0;
+}
+
+.paper-list-content {
+  flex: 1;
+  overflow: auto;
+  padding: 8px;
+}
+
+.paper-card {
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  background: #16213e;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.paper-info {
+  flex: 1;
+}
+
+.paper-title {
+  font-size: 12px;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.paper-meta {
+  font-size: 11px;
+  color: #888;
+}
+
+.paper-delete-btn {
+  background: transparent;
+  border: none;
+  color: #e94560;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0 4px;
+  flex-shrink: 0;
+  line-height: 1;
+}

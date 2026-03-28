@@ -2,6 +2,7 @@ import React from 'react';
 import { logout } from '../api/client';
 import PaperList from './PaperList';
 import Chat from './Chat';
+import './Main.css';
 
 interface Props {
   onLogout: () => void;
@@ -14,44 +15,24 @@ export default function Main({ onLogout }: Props) {
   };
 
   return (
-    <div style={{
-      height: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      background: '#1a1a2e',
-      color: 'white',
-    }}>
-      <div style={{
-        padding: '16px 24px',
-        background: '#16213e',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderBottom: '1px solid #333',
-      }}>
-        <h1 style={{ margin: 0, fontSize: '20px', color: 'white' }}>
+    <div className="main">
+      <div className="main-header">
+        <h1 className="main-title">
           📚 RAG System
         </h1>
         <button
-          style={{
-            padding: '8px 16px',
-            background: 'transparent',
-            border: '1px solid #555',
-            borderRadius: '6px',
-            color: '#aaa',
-            cursor: 'pointer',
-          }}
+          className="main-logout-btn"
           onClick={handleLogout}
         >
           Logout
         </button>
       </div>
 
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        <div style={{ width: '280px', borderRight: '1px solid #333', overflow: 'auto' }}>
+      <div className="main-content">
+        <div className="main-sidebar">
           <PaperList />
         </div>
-        <div style={{ flex: 1, overflow: 'hidden' }}>
+        <div className="main-chat">
           <Chat />
         </div>
       </div>
