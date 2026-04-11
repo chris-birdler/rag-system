@@ -9,7 +9,7 @@ http:
         certResolver: letsencrypt
 
     vereinsmanager:
-      rule: "Host(`www.mccv.at`) || Host(`mccv.at`)"
+      rule: "Host(`www.mccv.at`)"
       service: vereinsmanager-frontend
       entryPoints:
         - websecure
