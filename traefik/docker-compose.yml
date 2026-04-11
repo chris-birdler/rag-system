@@ -1,6 +1,8 @@
 services:
   traefik:
     image: traefik:v3.4
+    environment:
+      - DOCKER_API_VERSION=1.54
     ports:
       - "80:80"
       - "443:443"
