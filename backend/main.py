@@ -26,7 +26,7 @@ app.add_middleware(
         "http://localhost:3000",   # Development
         "http://localhost",        # Docker
         "http://localhost:80",     # Docker explizit
-        "*"                        # Temporär für Testing
+        "https://papers.mccv.at",  # Production
     ],
     allow_methods=["*"],
     allow_headers=["*"],

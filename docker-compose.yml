@@ -3,8 +3,6 @@ version: '3.8'
 services:
   backend:
     build: .
-    ports:
-      - "8000:8000"
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - COHERE_API_KEY=${COHERE_API_KEY}
@@ -17,15 +15,33 @@ services:
     volumes:
       - chroma_data:/app/.chroma
       - ./data:/app/data
+    networks:
+      - internal
     restart: unless-stopped
 
   frontend:
-    build: ./frontend
-    ports:
-      - "80:80"
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_API_URL: /api
     depends_on:
       - backend
+    networks:
+      - web
+      - internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.rag-frontend.rule=Host(`papers.mccv.at`)"
+      - "traefik.http.routers.rag-frontend.entrypoints=websecure"
+      - "traefik.http.routers.rag-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.rag-frontend.loadbalancer.server.port=80"
     restart: unless-stopped
+
+networks:
+  web:
+    external: true
+  internal:
+    driver: bridge
 
 volumes:
   chroma_data:
