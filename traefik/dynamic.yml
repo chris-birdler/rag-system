@@ -1,0 +1,28 @@
+http:
+  routers:
+    rag:
+      rule: "Host(`papers.mccv.at`)"
+      service: rag-frontend
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+
+    vereinsmanager:
+      rule: "Host(`www.mccv.at`) || Host(`mccv.at`)"
+      service: vereinsmanager-frontend
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+
+  services:
+    rag-frontend:
+      loadBalancer:
+        servers:
+          - url: "http://rag-system-frontend-1:80"
+
+    vereinsmanager-frontend:
+      loadBalancer:
+        servers:
+          - url: "http://vereinsmanager-frontend-1:80"
