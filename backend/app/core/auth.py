@@ -33,18 +33,17 @@ def verify_password(plain: str, hashed: str) -> bool:
         hashed.encode('utf-8')
     )
 
-USERS_DB = {
-    "admin": {
-        "username": "admin",
-        "hashed_password": hash_password("admin123"),
-        "role": "admin"
-    },
-    "user": {
-        "username": "user",
-        "hashed_password": hash_password("user123"),
-        "role": "user"
+# In-Memory User-Store.
+# Admin-Credentials kommen aus .env (ADMIN_USERNAME / ADMIN_PASSWORD).
+# Weitere User können hier per Code ergänzt oder später persistent gespeichert werden.
+USERS_DB: dict = {}
+
+if settings.admin_username and settings.admin_password:
+    USERS_DB[settings.admin_username] = {
+        "username": settings.admin_username,
+        "hashed_password": hash_password(settings.admin_password),
+        "role": "admin",
     }
-}
 
 def get_user(username: str) -> Optional[dict]:
     """User aus DB holen."""

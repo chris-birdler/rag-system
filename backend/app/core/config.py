@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     secret_key: str = "Chris2088"
     token_expire_hours: int = 24
 
+    # Admin-Account – aus .env laden, NICHT hardcoden
+    admin_username: str = ""
+    admin_password: str = ""
+
     class Config:
         env_file = ENV_PATH
 
