@@ -143,3 +143,41 @@
   background: #555;
   cursor: default;
 }
+
+@media (max-width: 768px) {
+  .chat-messages {
+    padding: 16px;
+  }
+
+  .chat-sources {
+    padding: 10px 16px;
+  }
+
+  .chat-input-bar {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .chat-clear-btn {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .chat-input {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .chat-send-btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .chat-message.user {
+    max-width: 90%;
+  }
+
+  .chat-message.assistant {
+    max-width: 100%;
+  }
+}
