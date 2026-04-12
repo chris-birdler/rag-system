@@ -3,6 +3,9 @@ FROM node:18-alpine AS build
 WORKDIR /app
 ARG REACT_APP_API_URL=/api
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
+# Disable CRA's inline webpack runtime so our strict CSP
+# (script-src 'self') doesn't block the bootstrap script.
+ENV INLINE_RUNTIME_CHUNK=false
 COPY package*.json ./
 RUN npm install
 COPY . .
