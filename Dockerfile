@@ -13,7 +13,10 @@ RUN mkdir -p data/pdfs
 
 # Nicht als root laufen – falls der Container ausgebrochen wird,
 # hat der Angreifer keine root-Rechte.
-RUN groupadd --system app && useradd --system --gid app --home /app app \
+# UID/GID sind fest auf 10001 gesetzt, damit Host-Bind-Mounts reproduzierbar
+# gechownt werden können (sudo chown -R 10001:10001 ./data).
+RUN groupadd --system --gid 10001 app \
+    && useradd --system --uid 10001 --gid app --home /app app \
     && chown -R app:app /app
 USER app
 
