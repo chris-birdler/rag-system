@@ -11,12 +11,35 @@ Der Rest der Applikation weiß nicht welcher Provider
 verwendet wird – alle haben dasselbe Interface.
 """
 
+from fastapi import HTTPException
+
 from backend.app.core.config import settings
 from backend.app.services.cost_tracker import CostTracker
 from backend.app.db.database import SessionLocal
 from backend.app.db.repositories import cost_repo
 
 tracker = CostTracker()
+
+
+def _enforce_daily_cost_cap() -> None:
+    """
+    Blockiert LLM-Calls, sobald das Tageslimit erreicht ist.
+    Schützt vor ausufernden Kosten wenn ein Admin-Token geleakt wird.
+    """
+    cap = settings.daily_cost_cap_usd
+    if cap <= 0:
+        return  # deaktiviert
+    with SessionLocal() as db:
+        spent = cost_repo.get_daily_cost_usd(db)
+    if spent >= cap:
+        raise HTTPException(
+            status_code=429,
+            detail=(
+                f"Daily cost cap reached (${spent:.2f} of ${cap:.2f}). "
+                "Resets at UTC midnight."
+            ),
+        )
+
 
 def get_llm_response(
     messages: list[dict],
@@ -35,6 +58,7 @@ def get_llm_response(
     Returns:
         Antwort als String
     """
+    _enforce_daily_cost_cap()
     temp = temperature if temperature is not None else settings.llm_temperature
     provider = settings.llm_provider.lower()
 
@@ -101,6 +125,16 @@ def _deepseek_response(
         temperature=temperature,
         max_tokens=max_tokens
     )
+
+    with SessionLocal() as db:
+        cost_repo.log_cost(
+            db,
+            model=settings.llm_model,
+            input_tokens=response.usage.prompt_tokens,
+            output_tokens=response.usage.completion_tokens,
+            call_type="llm",
+        )
+
     return response.choices[0].message.content
 
 
@@ -159,4 +193,14 @@ def _anthropic_response(
         system=system_msg,
         messages=user_messages
     )
+
+    with SessionLocal() as db:
+        cost_repo.log_cost(
+            db,
+            model=settings.llm_model,
+            input_tokens=response.usage.input_tokens,
+            output_tokens=response.usage.output_tokens,
+            call_type="llm",
+        )
+
     return response.content[0].text

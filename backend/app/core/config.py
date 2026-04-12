@@ -27,8 +27,18 @@ class Settings(BaseSettings):
     embedding_batch_size: int = 100
     reranker: str = "cohere"  # cohere oder local
 
-    secret_key: str = "Chris2088"
+    # JWT-Signatur – MUSS aus .env kommen (SECRET_KEY).
+    # Ohne gültigen Key lässt sich kein Token signieren/verifizieren.
+    secret_key: str = ""
     token_expire_hours: int = 24
+
+    # Admin-Account – aus .env laden, NICHT hardcoden
+    admin_username: str = ""
+    admin_password: str = ""
+
+    # Tageslimit für LLM-API-Kosten in USD. 0 = deaktiviert.
+    # Wird UTC-basiert zurückgesetzt.
+    daily_cost_cap_usd: float = 5.0
 
     class Config:
         env_file = ENV_PATH

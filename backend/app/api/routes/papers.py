@@ -1,5 +1,4 @@
 # backend/app/api/routes/papers.py
-import shutil
 from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, BackgroundTasks
 
@@ -9,6 +8,9 @@ from backend.app.core.auth import get_current_user, require_admin
 router = APIRouter()
 UPLOAD_DIR = Path("data/pdfs")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+# Maximale Upload-Größe pro PDF (gegen Disk-DoS)
+MAX_UPLOAD_SIZE = 50 * 1024 * 1024  # 50 MB
 
 def get_library():
     return PaperLibrary()
@@ -59,27 +61,47 @@ async def upload_paper(
     PDF hochladen und indexieren.
     Multipart Form Upload – Standard für Datei-Uploads.
     """
-    
-    if not file.filename.endswith(".pdf"):
-        raise HTTPException(400, "Only PDF files allowed")
 
-    # Datei speichern
-    file_path = UPLOAD_DIR / file.filename
-    with open(file_path, "wb") as f:
-        shutil.copyfileobj(file.file, f)
+    # Filename härten: Pfadanteile ("../", "/", "\") entfernen, damit
+    # ein bösartiger Name nicht außerhalb von UPLOAD_DIR schreiben kann.
+    raw_name = file.filename or ""
+    safe_name = Path(raw_name).name
+    if not safe_name or not safe_name.lower().endswith(".pdf"):
+        raise HTTPException(400, "Only PDF files allowed")
+    if ".." in safe_name or "/" in safe_name or "\\" in safe_name:
+        raise HTTPException(400, "Invalid filename")
+
+    file_path = UPLOAD_DIR / safe_name
+
+    # In Chunks streamen und Größe begrenzen.
+    size = 0
+    try:
+        with open(file_path, "wb") as f:
+            while chunk := await file.read(1024 * 1024):  # 1 MB
+                size += len(chunk)
+                if size > MAX_UPLOAD_SIZE:
+                    raise HTTPException(
+                        413,
+                        f"File too large (max {MAX_UPLOAD_SIZE // (1024 * 1024)} MB)"
+                    )
+                f.write(chunk)
+    except HTTPException:
+        # Teilweise geschriebene Datei wegräumen
+        file_path.unlink(missing_ok=True)
+        raise
 
     # Indexierung im Hintergrund starten
     background_tasks.add_task(
         _index_paper_task,
         str(file_path),
-        file.filename
+        safe_name
     )
 
     # Sofort antworten – nicht warten
     return {
         "status": "indexing",
-        "message": f"'{file.filename}' upload received, indexing started",
-        "filename": file.filename
+        "message": f"'{safe_name}' upload received, indexing started",
+        "filename": safe_name
     }
 
 @router.get("/status/{filename}")

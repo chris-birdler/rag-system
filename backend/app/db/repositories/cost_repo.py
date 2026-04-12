@@ -14,7 +14,19 @@ PRICES = {
     "deepseek-chat": {"input": 0.27 / 1_000_000, "output": 1.10 / 1_000_000},
     "text-embedding-3-large": {"input": 0.130 / 1_000_000, "output": 0},
     "text-embedding-3-small": {"input": 0.020 / 1_000_000, "output": 0},
+    # Anthropic Claude (approx. list price – exact dollars less wichtig,
+    # Hauptsache ein Preis > 0, damit das Tageslimit greift)
+    "claude-opus-4-6":   {"input": 15.00 / 1_000_000, "output": 75.00 / 1_000_000},
+    "claude-sonnet-4-6": {"input":  3.00 / 1_000_000, "output": 15.00 / 1_000_000},
+    "claude-haiku-4-5":  {"input":  1.00 / 1_000_000, "output":  5.00 / 1_000_000},
+    # Cohere embed
+    "embed-english-v3.0":      {"input": 0.10 / 1_000_000, "output": 0},
+    "embed-multilingual-v3.0": {"input": 0.10 / 1_000_000, "output": 0},
 }
+
+# Fallback für unbekannte Modelle: konservativ als GPT-4o behandeln,
+# damit das Tageslimit trotzdem greift (lieber zu früh stoppen als zu spät).
+_FALLBACK_PRICE = {"input": 2.50 / 1_000_000, "output": 10.00 / 1_000_000}
 
 
 def log_cost(
@@ -25,7 +37,7 @@ def log_cost(
     call_type: str = "llm"
 ) -> float:
     """Kosten in DB speichern."""
-    price = PRICES.get(model, {"input": 0, "output": 0})
+    price = PRICES.get(model, _FALLBACK_PRICE)
     cost = input_tokens * price["input"] + output_tokens * price["output"]
 
     entry = CostEntry(
@@ -38,6 +50,17 @@ def log_cost(
     db.add(entry)
     db.commit()
     return cost
+
+
+def get_daily_cost_usd(db: Session) -> float:
+    """Summe aller Kosten seit UTC-Mitternacht heute (für Tageslimit)."""
+    today_start = datetime.utcnow().replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    total = db.query(func.sum(CostEntry.cost_usd)).filter(
+        CostEntry.timestamp >= today_start
+    ).scalar()
+    return float(total or 0.0)
 
 
 def get_summary(db: Session) -> dict:
