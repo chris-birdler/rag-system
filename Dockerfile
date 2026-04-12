@@ -7,9 +7,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/ ./backend/
 
-# data Ordner erstellen aber keine PDFs kopieren
-# PDFs werden über Upload hinzugefügt
-RUN mkdir -p data/pdfs
+# Mount-Punkte für Named-Volumes vorwegnehmen.
+# Wenn /app/.chroma und /app/data im Image bereits existieren und app:app
+# gehören, übernimmt Docker bei einem frischen Named-Volume den Ownership
+# beim ersten Mount. Sonst wäre /app/.chroma nach einem `docker volume rm`
+# + `up` wieder root:root und der nicht-root Container könnte nicht schreiben.
+RUN mkdir -p data/pdfs .chroma
 
 # Nicht als root laufen – falls der Container ausgebrochen wird,
 # hat der Angreifer keine root-Rechte.
