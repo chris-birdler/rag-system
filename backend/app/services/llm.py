@@ -125,6 +125,16 @@ def _deepseek_response(
         temperature=temperature,
         max_tokens=max_tokens
     )
+
+    with SessionLocal() as db:
+        cost_repo.log_cost(
+            db,
+            model=settings.llm_model,
+            input_tokens=response.usage.prompt_tokens,
+            output_tokens=response.usage.completion_tokens,
+            call_type="llm",
+        )
+
     return response.choices[0].message.content
 
 
@@ -183,4 +193,14 @@ def _anthropic_response(
         system=system_msg,
         messages=user_messages
     )
+
+    with SessionLocal() as db:
+        cost_repo.log_cost(
+            db,
+            model=settings.llm_model,
+            input_tokens=response.usage.input_tokens,
+            output_tokens=response.usage.output_tokens,
+            call_type="llm",
+        )
+
     return response.content[0].text

@@ -23,9 +23,19 @@ import bcrypt
 # Token Extraktion aus Header
 security = HTTPBearer()
 
+
+# Startup-Guard: ohne starken SECRET_KEY dürfen KEINE JWTs signiert werden,
+# sonst wären Tokens trivial fälschbar. Bricht den Import hart ab.
+if len(settings.secret_key) < 32:
+    raise RuntimeError(
+        "SECRET_KEY must be set in .env and be at least 32 characters long. "
+        "Generate one with: python -c 'import secrets; print(secrets.token_urlsafe(48))'"
+    )
+
+
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(
-        password.encode('utf-8'), 
+        password.encode('utf-8'),
         bcrypt.gensalt()
     ).decode('utf-8')
 
@@ -34,6 +44,13 @@ def verify_password(plain: str, hashed: str) -> bool:
         plain.encode('utf-8'),
         hashed.encode('utf-8')
     )
+
+
+# Dummy-Hash für nicht-existierende User.
+# Wird verglichen, wenn der User nicht existiert – so läuft bcrypt immer
+# gleich lange und ein Angreifer kann nicht per Laufzeit herausfinden,
+# ob ein Username existiert.
+_DUMMY_HASH = hash_password("not-a-real-password-used-only-for-timing-defense")
 
 # In-Memory User-Store.
 # Admin-Credentials kommen aus .env (ADMIN_USERNAME / ADMIN_PASSWORD).
@@ -52,6 +69,9 @@ if settings.admin_username and settings.admin_password:
 # das per Proxy-IP – in diesem Single-Host-Setup genug, um Brute-Force zu stoppen.
 LOGIN_RATE_WINDOW_SEC = 60
 LOGIN_RATE_MAX_ATTEMPTS = 5
+# Obergrenze für verfolgte IPs – Schutz gegen Memory-Flood
+# durch Angreifer mit rotierenden Source-IPs.
+LOGIN_RATE_MAX_KEYS = 10_000
 _login_attempts: dict[str, list[float]] = defaultdict(list)
 
 
@@ -59,6 +79,17 @@ def check_login_rate_limit(client_ip: str) -> None:
     """429 werfen, wenn zu viele Login-Versuche aus derselben IP kamen."""
     now = time.time()
     cutoff = now - LOGIN_RATE_WINDOW_SEC
+
+    # Wenn der Tracking-Dict zu groß wird, abgelaufene Einträge aufräumen;
+    # hilft das nicht, komplett leeren (akzeptabel gegen Flood).
+    if len(_login_attempts) > LOGIN_RATE_MAX_KEYS:
+        for k in list(_login_attempts.keys()):
+            _login_attempts[k] = [t for t in _login_attempts[k] if t > cutoff]
+            if not _login_attempts[k]:
+                del _login_attempts[k]
+        if len(_login_attempts) > LOGIN_RATE_MAX_KEYS:
+            _login_attempts.clear()
+
     attempts = _login_attempts[client_ip]
     attempts[:] = [t for t in attempts if t > cutoff]
     if len(attempts) >= LOGIN_RATE_MAX_ATTEMPTS:
@@ -77,9 +108,14 @@ def get_user(username: str) -> Optional[dict]:
     return USERS_DB.get(username)
 
 def authenticate_user(username: str, password: str) -> Optional[dict]:
-    """Username + Password prüfen."""
+    """
+    Username + Password prüfen.
+    Läuft auch bei unbekanntem User durch einen bcrypt-Vergleich, damit die
+    Laufzeit konstant ist – verhindert Username-Enumeration per Timing.
+    """
     user = get_user(username)
     if not user:
+        verify_password(password, _DUMMY_HASH)  # constant-time defense
         return None
     if not verify_password(password, user["hashed_password"]):
         return None
