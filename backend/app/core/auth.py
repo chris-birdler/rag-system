@@ -10,6 +10,8 @@ Funktionsweise:
 3. Token bei jedem Request validiert
 """
 
+import time
+from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
@@ -44,6 +46,31 @@ if settings.admin_username and settings.admin_password:
         "hashed_password": hash_password(settings.admin_password),
         "role": "admin",
     }
+
+# --- Simple In-Memory Rate-Limit für Login ---
+# Kein externer Store nötig, ein Prozess reicht uns. Hinter Traefik greift
+# das per Proxy-IP – in diesem Single-Host-Setup genug, um Brute-Force zu stoppen.
+LOGIN_RATE_WINDOW_SEC = 60
+LOGIN_RATE_MAX_ATTEMPTS = 5
+_login_attempts: dict[str, list[float]] = defaultdict(list)
+
+
+def check_login_rate_limit(client_ip: str) -> None:
+    """429 werfen, wenn zu viele Login-Versuche aus derselben IP kamen."""
+    now = time.time()
+    cutoff = now - LOGIN_RATE_WINDOW_SEC
+    attempts = _login_attempts[client_ip]
+    attempts[:] = [t for t in attempts if t > cutoff]
+    if len(attempts) >= LOGIN_RATE_MAX_ATTEMPTS:
+        raise HTTPException(
+            status_code=429,
+            detail=(
+                f"Too many login attempts. "
+                f"Try again in {LOGIN_RATE_WINDOW_SEC} seconds."
+            ),
+        )
+    attempts.append(now)
+
 
 def get_user(username: str) -> Optional[dict]:
     """User aus DB holen."""

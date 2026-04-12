@@ -40,6 +40,17 @@ def log_cost(
     return cost
 
 
+def get_daily_cost_usd(db: Session) -> float:
+    """Summe aller Kosten seit UTC-Mitternacht heute (für Tageslimit)."""
+    today_start = datetime.utcnow().replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    total = db.query(func.sum(CostEntry.cost_usd)).filter(
+        CostEntry.timestamp >= today_start
+    ).scalar()
+    return float(total or 0.0)
+
+
 def get_summary(db: Session) -> dict:
     """Kosten Zusammenfassung aus DB."""
     entries = db.query(CostEntry).all()

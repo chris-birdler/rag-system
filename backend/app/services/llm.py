@@ -11,12 +11,35 @@ Der Rest der Applikation weiß nicht welcher Provider
 verwendet wird – alle haben dasselbe Interface.
 """
 
+from fastapi import HTTPException
+
 from backend.app.core.config import settings
 from backend.app.services.cost_tracker import CostTracker
 from backend.app.db.database import SessionLocal
 from backend.app.db.repositories import cost_repo
 
 tracker = CostTracker()
+
+
+def _enforce_daily_cost_cap() -> None:
+    """
+    Blockiert LLM-Calls, sobald das Tageslimit erreicht ist.
+    Schützt vor ausufernden Kosten wenn ein Admin-Token geleakt wird.
+    """
+    cap = settings.daily_cost_cap_usd
+    if cap <= 0:
+        return  # deaktiviert
+    with SessionLocal() as db:
+        spent = cost_repo.get_daily_cost_usd(db)
+    if spent >= cap:
+        raise HTTPException(
+            status_code=429,
+            detail=(
+                f"Daily cost cap reached (${spent:.2f} of ${cap:.2f}). "
+                "Resets at UTC midnight."
+            ),
+        )
+
 
 def get_llm_response(
     messages: list[dict],
@@ -35,6 +58,7 @@ def get_llm_response(
     Returns:
         Antwort als String
     """
+    _enforce_daily_cost_cap()
     temp = temperature if temperature is not None else settings.llm_temperature
     provider = settings.llm_provider.lower()
 
