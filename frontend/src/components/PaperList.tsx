@@ -59,8 +59,14 @@ export default function PaperList() {
         } catch {}
       }, 2000); // alle 2 Sekunden prüfen
 
-    } catch {
-      setMessage('Upload failed');
+    } catch (err: any) {
+      const detail = err?.response?.data?.detail;
+      const status = err?.response?.status;
+      setMessage(
+        detail
+          ? `❌ Upload failed (${status}): ${detail}`
+          : `❌ Upload failed${status ? ` (${status})` : ''}`
+      );
       setUploading(false);
     }
   };
